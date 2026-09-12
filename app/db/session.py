@@ -11,8 +11,8 @@ engine = create_engine(
     settings.database_url
 )
 
-def create_tables():
-    Base.metadata.create_all(bind = engine)
+# def create_tables():
+#     Base.metadata.create_all(bind = engine)
     
 SessionLocal = sessionmaker(
     bind=engine , 

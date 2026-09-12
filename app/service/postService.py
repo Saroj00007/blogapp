@@ -23,4 +23,14 @@ def create_post(
     db.refresh(post)
     
     return post
+
+
+def get_post(
+    post_id : int , 
+    db : Session 
+): 
+    return db.get(Post , post_id)
+
+
+    
     

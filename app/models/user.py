@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Mapped ,mapped_column
+from sqlalchemy.orm import Mapped ,mapped_column  , relationship
 from app.db.base import Base
 
 from sqlalchemy import String 
@@ -11,4 +11,10 @@ class User(Base):
     username : Mapped[str] = mapped_column(unique=True)
     email : Mapped[str]  = mapped_column(unique=True)
     password_hash : Mapped[str]
+    
+    posts = relationship(
+        "Post" , 
+        back_populates= "author"
+    )
+    
     

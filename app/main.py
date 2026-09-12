@@ -11,7 +11,7 @@ app = FastAPI(
     debug=settings.debug
 )
 
-create_tables()
+
 
 app.include_router(router=router , prefix="/api/v1")
 
