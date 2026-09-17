@@ -2,7 +2,7 @@ from fastapi import APIRouter , Depends
 from sqlalchemy.orm import Session
 from app.db.session import get_session
 
-from app.api.v1 import posts  , users , auth
+from app.api.v1 import posts  , users , auth  , comments
 
 
 router = APIRouter()

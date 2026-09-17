@@ -17,4 +17,9 @@ class User(Base):
         back_populates= "author"
     )
     
+    comments = relationship(
+        "Comment" , 
+        back_populates="comments"
+    )
+    
     

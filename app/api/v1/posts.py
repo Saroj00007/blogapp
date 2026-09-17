@@ -6,6 +6,13 @@ from fastapi import HTTPException , status
 from sqlalchemy import select
 from app.service.postService import create_post , get_post , get_all_post , update_post , delete_post
 from app.schema.post import PostResponse , PostCreate
+from app.dependencies.auth import get_current_user
+from app.models.user import User
+from app.schema.post import PostUpdate
+from app.models.post import Post
+
+
+
 
 
 router = APIRouter()
@@ -14,13 +21,14 @@ router = APIRouter()
 @router.post("/post" , response_model=PostResponse , status_code= status.HTTP_201_CREATED)
 def create_blog_post(
     post_data : PostCreate , 
-    db: Session = Depends(get_session) ,    
+    db: Session = Depends(get_session) ,  
+    current_user : User =  Depends(get_current_user)
 ): 
     
     post = create_post(
         db = db , 
         post_data= post_data , 
-        author_id  = 1 # later when we implement authorization and authentication we will implement this authore id by extracting from token. 
+        author_id  = current_user.id # later when we implement authorization and authentication we will implement this authore id by extracting from token. 
     )
     
     
@@ -63,17 +71,24 @@ def get_allRequest( limit: int = 10 , skip: int  = 0 ,published : bool | None = 
 @router.patch("/post/{post_id}" , response_model=PostResponse)
 def updated_post(
     post_id  :int , 
+    post  : PostUpdate , 
     db : Session = Depends(get_session) , 
+    current_user : User = Depends(get_current_user)
+      
 ): 
-    post = get_post(db=db ,post_id=post_id )
+    imported_post = get_post(db=db ,post_id=post_id )
     
-    if post is None : 
+    if imported_post is None : 
         raise HTTPException(
             detail = "post not found" , 
             status_code=404
         )
-        
-    
+     
+    if imported_post.author_id != current_user.id  :
+        raise HTTPException(
+            detail="not authorize to modify/edit this page!" , 
+            status_code=403
+        )  
     return update_post(
         db = db  , 
         post_data = post , 
@@ -81,14 +96,25 @@ def updated_post(
     )
     
 @router.delete("/post/{post_id}"  , status_code=status.HTTP_204_NO_CONTENT)
-def deleted_post(post_id : int ,db : Session = Depends(get_session) ):
+def deleted_post(post_id : int ,
+                 db : Session = Depends(get_session) ,
+                 current_user : User = Depends(get_current_user)
+                 ):
     
-    post = db.get(post , post_id)
+    post = db.get(Post , post_id)
+    
     if post is None:
         raise HTTPException(
             detail="post not found"  , 
             status_code= 404
         )
+    
+    if post.author_id != current_user.id: 
+        raise HTTPException(
+            detail="unauthorized ascess" , 
+            status_code  = 403
+        )
+    
     
     delete_post(db=db , post=post)
     

@@ -49,3 +49,7 @@ class Post(Base):
         back_populates="posts",
     )
     
+    comments = relationship(
+        "Comment" , 
+        back_populates="comments"
+    )

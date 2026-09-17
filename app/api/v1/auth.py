@@ -4,7 +4,9 @@ from app.schema.auth import loginSchema
 
 from app.db.session import get_session
 
-from app.service.user_services import authenticate_user
+from app.service.user_services import authenticate_user 
+from app.core.security import create_access_token
+
 
 
 router = APIRouter()
@@ -20,9 +22,14 @@ def login_user(login_data  :loginSchema , db : Session = Depends(get_session)):
         login_data=login_data
     )
     
+    access_token = create_access_token(user_id= user.id)
+    
     
     return {
-        "message " : "logged in succesfully"
+       "ascess_token"  : access_token , 
+       "token_type"  :"Bearrer"
     }
+    
+    
     
     
